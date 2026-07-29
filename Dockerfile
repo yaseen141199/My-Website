@@ -1,16 +1,16 @@
-# Build frontend
-FROM node:18-alpine AS frontend-builder
+# Build frontend - استخدام Node.js 22
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm install
+RUN npm ci --omit=dev || npm install
 COPY frontend .
 RUN npm run build
 
-# Build backend
-FROM node:18-alpine AS backend-builder
+# Build backend - استخدام Node.js 22
+FROM node:22-alpine AS backend-builder
 WORKDIR /app/backend
 COPY backend/package*.json ./
-RUN npm install
+RUN npm ci --omit=dev || npm install
 COPY backend .
 
 # Final image
