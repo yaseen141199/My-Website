@@ -7,3 +7,5 @@ export const DEFAULT_CONFIG: ModelConfig = {
     topK: 40,
     topP: 0.95,
 };
+
+export const MY_AVATAR = './avatar.jpg';

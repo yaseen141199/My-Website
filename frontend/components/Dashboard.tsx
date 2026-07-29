@@ -4,7 +4,7 @@ import {
     FileText, Heart, MessageSquare, Globe, Code, Mail, Sparkles, GitBranch, Link
 } from 'lucide-react';
 import { generateContentStream } from '../services/geminiService';
-import { DEFAULT_CONFIG } from '../constants';
+import { DEFAULT_CONFIG, MY_AVATAR } from '../constants';
 
 const WelcomeWidget = () => (
     <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
@@ -15,7 +15,7 @@ const WelcomeWidget = () => (
             </div>
         </div>
         <div className="px-5 pb-5 relative">
-            <img src="https://picsum.photos/100/100" alt="Avatar" className="w-20 h-20 rounded-full border-4 border-white absolute -top-10 shadow-sm bg-white" />
+            <img src={MY_AVATAR} alt="Avatar" className="w-20 h-20 rounded-full border-4 border-white absolute -top-10 shadow-sm bg-white object-cover" />
             <div className="flex flex-col md:flex-row text-center md:text-left mt-14 mb-6 justify-around border-t border-b border-gray-100 py-4">
                 <div><span className="block font-bold text-gray-800">Yaseen Ahmed</span><span className="text-sm text-gray-500 mt-1 block">DevOps Engineer</span></div>
                 <div><span className="block font-bold text-gray-800">8</span><span className="text-sm text-gray-500 mt-1 block">Projects</span></div>
@@ -264,7 +264,7 @@ const PostWidget = () => (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex flex-col">
         <h2 className="text-xl font-bold mb-6 text-gray-800">Latest Post</h2>
         <div className="flex items-center gap-4 mb-4">
-            <img src="https://picsum.photos/50/50" alt="Avatar" className="w-12 h-12 rounded-full" />
+            <img src={MY_AVATAR} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
             <div>
                 <h3 className="font-bold text-gray-800">Yaseen Ahmed</h3>
                 <span className="text-xs text-gray-500">About 3 Hours Ago</span>

@@ -100,6 +100,40 @@ You can easily run this dashboard using Docker. A `Dockerfile` is included which
 
 ---
 
+## Jenkins Pipeline Setup (Build, Test, Push)
+
+A `Jenkinsfile` is included in the root of this repository to automate the process of building the Docker image, running a quick test, and pushing it to Docker Hub.
+
+### Prerequisites in Jenkins
+
+1.  **Docker Pipeline Plugin:** Ensure the "Docker Pipeline" plugin is installed in your Jenkins instance.
+2.  **Docker Installed on Agent:** The Jenkins agent running this pipeline must have Docker installed and the Jenkins user must have permissions to run Docker commands (usually by adding the `jenkins` user to the `docker` group).
+3.  **Docker Hub Credentials:**
+    *   Go to **Manage Jenkins** > **Credentials** > **System** > **Global credentials (unrestricted)**.
+    *   Click **Add Credentials**.
+    *   Kind: **Username with password**.
+    *   Username: Your Docker Hub username (`yacin141199`).
+    *   Password: Your Docker Hub password or Personal Access Token (PAT).
+    *   ID: **`docker-hub-credentials`** (This exact ID is referenced in the `Jenkinsfile`).
+    *   Description: Docker Hub Credentials.
+
+### How to use the Pipeline
+
+1.  Create a new **Pipeline** job in Jenkins.
+2.  In the Pipeline section, choose **Pipeline script from SCM**.
+3.  Select your SCM (e.g., Git) and provide the repository URL.
+4.  Ensure the **Script Path** is set to `Jenkinsfile`.
+5.  Save and click **Build Now**.
+
+The pipeline will:
+1.  Checkout the code.
+2.  Build the image `yacin141199/demo1:v[BUILD_NUMBER]`.
+3.  Run a temporary container to verify Nginx serves the page.
+4.  Push the image (with the build number tag and the `latest` tag) to Docker Hub.
+5.  Clean up local images.
+
+---
+
 ## How to Deploy on AWS EC2 (Nginx or Apache)
 
 Since this is a purely frontend application (HTML, CSS, JS/TS via ESM), it consists only of static files. You do not need Node.js, PM2, or any backend runtime on the server. You only need a web server to serve the static files.

@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    environment {
+        // Define your Docker Hub credentials ID here (configured in Jenkins)
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
+        // Define your Docker Hub username and repository name
+        DOCKER_IMAGE = 'yacin141199/demo1'
+        // Generate a tag based on the build number
+        IMAGE_TAG = "v${BUILD_NUMBER}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from your repository
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building Docker image: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+                    // Build the Docker image using the Dockerfile in the workspace
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Test/Run Container (Optional)') {
+            steps {
+                script {
+                    echo "Running the container for a quick test..."
+                    // Run the container in the background to ensure it starts successfully
+                    // We map port 8080 on the host to port 80 in the container
+                    sh "docker run -d -p 8080:80 --name test-dashboard ${DOCKER_IMAGE}:${IMAGE_TAG}"
+                    
+                    // Add a small delay to let the container start
+                    sleep 5
+                    
+                    // Perform a simple curl test to check if Nginx is serving the page
+                    // If curl fails, the pipeline will fail
+                    sh "curl -f http://localhost:8080 || exit 1"
+                    
+                    echo "Test passed. Stopping and removing the test container..."
+                    sh "docker stop test-dashboard"
+                    sh "docker rm test-dashboard"
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    echo "Pushing Docker image to Docker Hub..."
+                    // Use the Docker credentials configured in Jenkins to authenticate
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS_ID) {
+                        // Push the specific tag
+                        dockerImage.push("${IMAGE_TAG}")
+                        // Optionally, also push the 'latest' tag
+                        dockerImage.push("latest")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline execution finished."
+            // Clean up local images to save space on the Jenkins agent
+            sh "docker rmi ${DOCKER_IMAGE}:${IMAGE_TAG} || true"
+            sh "docker rmi ${DOCKER_IMAGE}:latest || true"
+        }
+        success {
+            echo "Successfully built and pushed ${DOCKER_IMAGE}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "Pipeline failed. Please check the logs."
+        }
+    }
+}
